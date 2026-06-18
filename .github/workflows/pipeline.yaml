@@ -1,0 +1,54 @@
+name: CI-CD Demo
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build-test-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Instalar .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+      - name: Testes
+        run: dotnet test --no-build --configuration Release
+      - name: Publish
+        run: dotnet publish src/DemoApi/DemoApi.csproj -c Release -o publish
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-api
+          path: publish
+
+  deploy-homolog:
+    needs: build-test-publish
+    environment:
+      name: Homolog
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy Homolog
+        run: |
+          echo "Deploy realizado com sucesso"
+          echo "Aplicação publicada em homologação"
+          echo "Deploy em ${{ vars.HOMOLOG_URL || secrets.HOMOLOG_URL }}"
+
+  deploy-production:
+    needs: deploy-homolog
+    environment:
+      name: Production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy Produção
+        run: |
+          echo "Deploy realizado em produção"
+          echo "Deploy em ${{ vars.PROD_URL || secrets.PROD_URL }}"
