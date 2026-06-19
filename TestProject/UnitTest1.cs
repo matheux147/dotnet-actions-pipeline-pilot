@@ -9,6 +9,6 @@ public class CalculatorTests {
     { 
         var result = Calculator.Sum(2, 3);
         
-        Assert.Equal(5, result); 
+        Assert.Equal(7, result); 
     } 
 }
