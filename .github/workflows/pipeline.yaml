@@ -32,6 +32,7 @@ jobs:
 
   deploy-homolog:
     needs: build-test-publish
+    if: github.ref == 'refs/heads/develop'
     environment:
       name: Homolog
     runs-on: ubuntu-latest
@@ -43,7 +44,8 @@ jobs:
           echo "Deploy em ${{ vars.HOMOLOG_URL || secrets.HOMOLOG_URL }}"
 
   deploy-production:
-    needs: deploy-homolog
+    needs: build-test-publish
+    if: github.ref == 'refs/heads/main'
     environment:
       name: Production
     runs-on: ubuntu-latest
